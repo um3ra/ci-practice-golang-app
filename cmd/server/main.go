@@ -40,6 +40,17 @@ func (s *userGrpcServer) Get(ctx context.Context, data *userGrpc.GetRequest) (*u
 	}, nil
 }
 
+func (s *userGrpcServer) GetById(ctx context.Context, req *userGrpc.GetByIdRequest) (*userGrpc.GetByIdResponse, error) {
+	user, err := s.userService.GetById(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	userPb := converter.ToUserPbFromService(user)
+	return &userGrpc.GetByIdResponse{
+		User: userPb,
+	}, nil
+}
+
 func main() {
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
 
