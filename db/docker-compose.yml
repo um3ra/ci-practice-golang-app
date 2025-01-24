@@ -1,0 +1,25 @@
+services:
+  postgres:
+    build:
+      context: ./db
+    container_name: "postgres-user-api"
+    image: "postgres:alpine3.18"
+    restart: "unless-stopped"
+    ports:
+      - "${PG_PORT}:5432"
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+  migrator:
+    build:
+      dockerfile: "./migrator.Dockerfile"
+    restart: "on-failure"  
+    environment:
+      DB_HOST: postgres  
+      
+
+volumes:
+  postgres_volume:
