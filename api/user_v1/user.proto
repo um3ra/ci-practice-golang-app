@@ -11,9 +11,10 @@ option go_package = "github.com/um3ra/auth-microservice/pkg/user_v1;user_v1";
 
 service UserV1 {
   rpc Create(CreateRequest) returns (CreateResponse);
-  rpc Get(GetRequest) returns (GetResponse);
+  rpc GetById(GetByIdRequest) returns (GetByIdResponse);
   rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
   rpc Update(UpdateRequest) returns (google.protobuf.Empty);
+  rpc Get(GetRequest) returns (GetResponse);
 }
 
 message User {
@@ -35,14 +36,23 @@ message CreateResponse{
   int64 id = 1;
 }
 
-message GetRequest{
+message GetRequest {
+  int64 limit = 1;
+  int64 offset = 2;
+}
+
+message GetResponse{
+  repeated User users = 1;
+}
+
+message GetByIdRequest{
   int64 id = 1;
 }
 enum Role {
   Admin = 0;
   Regular = 1;
 }
-message GetResponse {
+message GetByIdResponse {
   User user = 1;
 }
 

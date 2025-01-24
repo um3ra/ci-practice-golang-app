@@ -54,3 +54,11 @@ func (r *userRepository) GetAll(ctx context.Context) ([]model.User, error) {
 	}
 	return users, nil
 }
+
+func (r *userRepository) Create(ctx context.Context, user *model.User) (int64, error){
+	return 0, nil
+}
+
+func (r *userRepository) GetById(ctx context.Context, id int64) (*model.User, error){
+	return nil, nil
+}
