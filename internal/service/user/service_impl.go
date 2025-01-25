@@ -18,7 +18,7 @@ func NewUserService(userRepository repository.UserRepository) *userService {
 }
 
 func (s *userService) GetAll(ctx context.Context) ([]model.User, error) {
-	res, err := s.GetAll(ctx)
+	res, err := s.userRepository.GetAll(ctx)
 	return res, err
 }
 

@@ -8,6 +8,7 @@ import (
 	"github.com/um3ra/auth-microservice/internal/model"
 	"github.com/um3ra/auth-microservice/internal/repository/converter"
 	repoMod "github.com/um3ra/auth-microservice/internal/repository/model"
+	"github.com/georgysavva/scany/v2/pgxscan"
 )
 
 const (
@@ -69,13 +70,13 @@ func (r *userRepository) GetById(ctx context.Context, id int64) (*model.User, er
 	if err != nil {
 		return nil, err
 	}
-
-	var user model.User
-
-	row := r.pgPool.QueryRow(ctx, sql, args...)
-	if err := row.Scan(&user.Id, &user.Name, &user.Email, &user.UpdatedAt, &user.CreatedAt); err != nil {
+	var user repoMod.User
+	rows, err := r.pgPool.Query(ctx, sql, args...)
+	if err != nil {
 		return nil, err
 	}
-
-	return &user, nil
+	if err := pgxscan.ScanOne(&user, rows); err != nil {
+		return nil, err
+	}
+	return converter.ToUserFromRepo(&user), nil
 }
