@@ -1,7 +1,7 @@
 package converter
 
 import (
-	repoMod "github.com/um3ra/auth-microservice/internal/repository/model"
+	repoMod "github.com/um3ra/auth-microservice/internal/repository/user/model"
 	model "github.com/um3ra/auth-microservice/internal/model"
 )
 

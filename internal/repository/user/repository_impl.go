@@ -7,8 +7,8 @@ import (
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/um3ra/auth-microservice/internal/client/db"
 	"github.com/um3ra/auth-microservice/internal/model"
-	"github.com/um3ra/auth-microservice/internal/repository/converter"
-	repoMod "github.com/um3ra/auth-microservice/internal/repository/model"
+	"github.com/um3ra/auth-microservice/internal/repository/user/converter"
+	repoMod "github.com/um3ra/auth-microservice/internal/repository/user/model"
 )
 
 const (
