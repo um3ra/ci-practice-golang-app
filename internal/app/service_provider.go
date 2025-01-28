@@ -4,11 +4,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/um3ra/auth-microservice/config"
 	cfg "github.com/um3ra/auth-microservice/config"
 	"github.com/um3ra/auth-microservice/internal/api/user"
 	userHandler "github.com/um3ra/auth-microservice/internal/api/user"
+	"github.com/um3ra/auth-microservice/internal/client/db"
+	"github.com/um3ra/auth-microservice/internal/client/db/pg"
 	"github.com/um3ra/auth-microservice/internal/repository"
 	userRepo "github.com/um3ra/auth-microservice/internal/repository/user"
 	"github.com/um3ra/auth-microservice/internal/service"
@@ -17,7 +18,7 @@ import (
 )
 
 type serviceProvider struct {
-	pgPool         *pgxpool.Pool
+	db             db.Client
 	dbConfig       config.DbConfig
 	grpcConfig     config.GrpcConfig
 	userRepository repository.UserRepository
@@ -41,7 +42,7 @@ func (s *serviceProvider) DbConfig() config.DbConfig {
 	return s.dbConfig
 }
 
-func (s *serviceProvider) GrpcConfig(ctx context.Context) config.GrpcConfig {
+func (s *serviceProvider) GrpcConfig() config.GrpcConfig {
 	if s.grpcConfig == nil {
 		grpc, err := cfg.NewGrpcConfig()
 		if err != nil {
@@ -49,29 +50,29 @@ func (s *serviceProvider) GrpcConfig(ctx context.Context) config.GrpcConfig {
 		}
 		s.grpcConfig = grpc
 	}
-
 	return s.grpcConfig
 }
 
-func (s *serviceProvider) PgPool(ctx context.Context) *pgxpool.Pool {
-	if s.pgPool == nil {
-		pool, err := pgxpool.New(ctx, s.DbConfig().DSN())
+func (s *serviceProvider) DbClient(ctx context.Context) db.Client {
+	if s.db == nil {
+		client, err := pg.NewClient(ctx, s.DbConfig().DSN())
 		if err != nil {
-			log.Fatalf("Db connection error: %s", err.Error())
+			log.Fatalf("Failed to database connect: %s\n", err.Error())
 		}
-		poolCloser := func () error {
-			pool.Close()
-			return nil
+		// err = client.DB().Ping(ctx)
+		if err != nil {
+			log.Fatalf("Failed to ping database: %s\n", err.Error())
 		}
-		closer.Add(poolCloser)
-		s.pgPool = pool
+		s.db = client
+		closer.Add(s.db.Close)
 	}
-	return s.pgPool
+
+	return s.db
 }
 
 func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
 	if s.userRepository == nil {
-		s.userRepository = userRepo.NewUserRepository(s.PgPool(ctx))
+		s.userRepository = userRepo.NewUserRepository(s.DbClient(ctx))
 	}
 	return s.userRepository
 }

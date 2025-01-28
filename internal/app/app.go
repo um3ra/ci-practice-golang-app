@@ -2,8 +2,6 @@ package app
 
 import (
 	"context"
-	"log"
-
 	"net"
 
 	"github.com/um3ra/auth-microservice/config"
@@ -14,30 +12,77 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func Bootstrap() {
-	if err := config.NewConfig(); err != nil {
-		log.Fatal(err)
-	}
+const (
+	envPath = ".env"
+)
 
-	defer func () {
-		log.Println("Close functions")
+func NewApp(ctx context.Context) (*App, error) {
+	app := &App{}
+
+	err := app.initDeps(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	return app, nil
+}
+
+func (a *App) Run() error {
+	defer func() {
 		closer.CloseAll()
 		closer.Wait()
 	}()
+	return a.runGrpcServer()
+}
 
-	context := context.Background()
-	provider := newServiceProvider()
-	grpcConf := provider.GrpcConfig(context)
+type App struct {
+	provider   *serviceProvider
+	grpcServer *grpc.Server
+}
 
-	l, err := net.Listen("tcp", grpcConf.Address())
-
-	if err != nil {
-		log.Fatalf("Failed to listen: %s", err.Error())
+func (a *App) initDeps(ctx context.Context) error {
+	inits := []func(ctx context.Context) error{
+		a.initConfig,
+		a.initProvider,
+		a.initGrpcServer,
 	}
+	for _, f := range inits {
+		if err := f(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a *App) initProvider(_ context.Context) error {
+	a.provider = newServiceProvider()
+	return nil
+}
+
+func (a *App) initConfig(_ context.Context) error {
+	if err := config.NewConfig(envPath); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) initGrpcServer(ctx context.Context) error {
 	s := grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
-	userGrpc.RegisterUserV1Server(s, provider.UserHandler(context))
-	reflection.Register(s)
-	if err := s.Serve(l); err != nil {
-		log.Fatalf("Failed to serve: %s", err.Error())
+	a.grpcServer = s
+	reflection.Register(a.grpcServer)
+	handler := a.provider.UserHandler(ctx)
+	userGrpc.RegisterUserV1Server(a.grpcServer, handler)
+	return nil
+}
+
+func (a *App) runGrpcServer() error {
+	l, err := net.Listen("tcp", a.provider.GrpcConfig().Address())
+	if err != nil {
+		return err
 	}
+	err = a.grpcServer.Serve(l)
+	if err != nil {
+		return err
+	}
+	return nil
 }

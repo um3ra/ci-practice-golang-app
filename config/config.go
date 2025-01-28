@@ -4,8 +4,8 @@ import (
 	env "github.com/joho/godotenv"
 )
 
-func NewConfig() error {
-	if err := env.Load(); err != nil {
+func NewConfig(path string) error {
+	if err := env.Load(path); err != nil {
 		return err
 	}
 	return nil

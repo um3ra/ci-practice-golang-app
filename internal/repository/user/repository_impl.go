@@ -2,9 +2,10 @@ package user
 
 import (
 	"context"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/georgysavva/scany/v2/pgxscan"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/um3ra/auth-microservice/internal/client/db"
 	"github.com/um3ra/auth-microservice/internal/model"
 	"github.com/um3ra/auth-microservice/internal/repository/converter"
 	repoMod "github.com/um3ra/auth-microservice/internal/repository/model"
@@ -23,12 +24,12 @@ const (
 var selectQ = sq.Select(idColumn, nameColumn, emailColumn, updatedAtColumn, createdAtColumn).From(tableName)
 
 type userRepository struct {
-	pgPool *pgxpool.Pool
+	dbClient db.Client
 }
 
-func NewUserRepository(pgPool *pgxpool.Pool) *userRepository {
+func NewUserRepository(client db.Client) *userRepository {
 	return &userRepository{
-		pgPool: pgPool,
+		dbClient: client,
 	}
 }
 
@@ -39,8 +40,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	q, err := r.pgPool.Query(ctx, sql, args...)
+	q, err := r.dbClient.DB().QueryContext(ctx, db.Query{QueryRaw: sql}, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (r *userRepository) GetById(ctx context.Context, id int64) (*model.User, er
 		return nil, err
 	}
 	var user repoMod.User
-	rows, err := r.pgPool.Query(ctx, sql, args...)
+	rows, err := r.dbClient.DB().QueryContext(ctx, db.Query{QueryRaw: sql}, args...)
 	if err != nil {
 		return nil, err
 	}
