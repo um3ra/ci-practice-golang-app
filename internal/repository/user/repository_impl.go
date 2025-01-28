@@ -2,13 +2,12 @@ package user
 
 import (
 	"context"
-
 	sq "github.com/Masterminds/squirrel"
+	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/um3ra/auth-microservice/internal/model"
 	"github.com/um3ra/auth-microservice/internal/repository/converter"
 	repoMod "github.com/um3ra/auth-microservice/internal/repository/model"
-	"github.com/georgysavva/scany/v2/pgxscan"
 )
 
 const (

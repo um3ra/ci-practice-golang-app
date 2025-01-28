@@ -7,6 +7,7 @@ import (
 	"net"
 
 	"github.com/um3ra/auth-microservice/config"
+	"github.com/um3ra/auth-microservice/pkg/closer"
 	userGrpc "github.com/um3ra/auth-microservice/pkg/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -17,6 +18,12 @@ func Bootstrap() {
 	if err := config.NewConfig(); err != nil {
 		log.Fatal(err)
 	}
+
+	defer func () {
+		log.Println("Close functions")
+		closer.CloseAll()
+		closer.Wait()
+	}()
 
 	context := context.Background()
 	provider := newServiceProvider()

@@ -13,6 +13,7 @@ import (
 	userRepo "github.com/um3ra/auth-microservice/internal/repository/user"
 	"github.com/um3ra/auth-microservice/internal/service"
 	userSrv "github.com/um3ra/auth-microservice/internal/service/user"
+	"github.com/um3ra/auth-microservice/pkg/closer"
 )
 
 type serviceProvider struct {
@@ -58,6 +59,11 @@ func (s *serviceProvider) PgPool(ctx context.Context) *pgxpool.Pool {
 		if err != nil {
 			log.Fatalf("Db connection error: %s", err.Error())
 		}
+		poolCloser := func () error {
+			pool.Close()
+			return nil
+		}
+		closer.Add(poolCloser)
 		s.pgPool = pool
 	}
 	return s.pgPool
