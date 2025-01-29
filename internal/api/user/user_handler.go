@@ -43,3 +43,7 @@ func (s *UserHandler) GetById(ctx context.Context, req *userGrpc.GetByIdRequest)
 		User: userPb,
 	}, nil
 }
+
+func (h *UserHandler) Create(ctx context.Context, req *userGrpc.CreateRequest) (*userGrpc.CreateResponse, error) {
+	return &userGrpc.CreateResponse{}, nil
+}

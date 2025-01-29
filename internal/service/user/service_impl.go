@@ -1,8 +1,10 @@
 package user
 
 import (
-	"github.com/um3ra/auth-microservice/internal/repository"
 	"context"
+	"fmt"
+
+	"github.com/um3ra/auth-microservice/internal/repository"
 
 	"github.com/um3ra/auth-microservice/internal/model"
 )
@@ -24,7 +26,9 @@ func (s *userService) GetAll(ctx context.Context) ([]model.User, error) {
 
 
 func (s *userService) Create(ctx context.Context, user *model.User) (int64, error){
-	return 0, nil
+	id, err := s.userRepository.Create(ctx, user)
+	fmt.Println(id, err)
+	return id, err
 }
 
 func (s *userService)  GetById(ctx context.Context, id int64) (*model.User, error){

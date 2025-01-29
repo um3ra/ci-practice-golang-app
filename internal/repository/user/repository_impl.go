@@ -59,11 +59,41 @@ func (r *userRepository) GetAll(ctx context.Context) ([]model.User, error) {
 }
 
 func (r *userRepository) Create(ctx context.Context, user *model.User) (int64, error) {
-	return 0, nil
+	builder := sq.Insert(tableName).PlaceholderFormat(sq.Dollar).Columns(nameColumn, emailColumn, "password").Values(user.Name, user.Email, user.Password).Suffix("RETURNING id")
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		return 0, err
+	}
+	var id int64
+
+	err = r.dbClient.DB().QueryRowContext(ctx, db.Query{QueryRaw: sql, Name: "user creating sql req"}, args...).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (r *userRepository) GetById(ctx context.Context, id int64) (*model.User, error) {
 	builder := selectQ.PlaceholderFormat(sq.Dollar).Where("id=$1", id)
+	sql, args, err := builder.ToSql()
+
+	if err != nil {
+		return nil, err
+	}
+	var user repoMod.User
+	rows, err := r.dbClient.DB().QueryContext(ctx, db.Query{QueryRaw: sql}, args...)
+	if err != nil {
+		return nil, err
+	}
+	if err := pgxscan.ScanOne(&user, rows); err != nil {
+		return nil, err
+	}
+	return converter.ToUserFromRepo(&user), nil
+}
+
+func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	builder := selectQ.PlaceholderFormat(sq.Dollar).Where("email=$1", email)
 	sql, args, err := builder.ToSql()
 
 	if err != nil {
