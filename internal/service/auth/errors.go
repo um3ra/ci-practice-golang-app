@@ -1,5 +1,5 @@
 package auth
 
 const (
-	userExistsError = "The user already exists"
+	UserExistsError = "The user already exists"
 )

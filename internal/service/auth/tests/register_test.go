@@ -2,15 +2,16 @@ package tests
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v7"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/um3ra/auth-microservice/internal/model"
 	"github.com/um3ra/auth-microservice/internal/repository/mocks"
-	"github.com/stretchr/testify/mock"
-	
+
 	authService "github.com/um3ra/auth-microservice/internal/service/auth"
 )
 
@@ -20,7 +21,7 @@ func TestRegister(t *testing.T) {
 		Ctx  context.Context
 		User *model.User
 	}
-	repoErr := fmt.Errorf("repo error")
+	repoErr := errors.New("repo mock error")
 
 	var (
 		ctx      = context.Background()
@@ -45,16 +46,28 @@ func TestRegister(t *testing.T) {
 		mockFun  mockFun
 	}{
 		{
-			testName: "success register test",
+			testName: "register test success case",
 			args: args{
 				Ctx:  ctx,
 				User: successUser,
 			},
-			want: id,
-			err:  repoErr,
+			want: 2,
+			err:  nil,
 			mockFun: func(repoMock *mocks.UserRepository) {
 				repoMock.On("GetByEmail", ctx, email).Return(nil, repoErr).Once()
-				repoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(successUser.Id, nil).Once()
+				repoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(int64(2), nil).Once()
+			},
+		},
+		{
+			testName: "register test fail case (user exists)",
+			args: args{
+				Ctx:  ctx,
+				User: successUser,
+			},
+			want: 0,
+			err:  errors.New(authService.UserExistsError),
+			mockFun: func(repoMock *mocks.UserRepository) {
+				repoMock.On("GetByEmail", ctx, successUser.Email).Return(successUser, nil).Once()
 			},
 		},
 	}
@@ -64,9 +77,10 @@ func TestRegister(t *testing.T) {
 			authMock := mocks.NewUserRepository(t)
 			tt.mockFun(authMock)
 			authSrv := authService.NewAuthService(authMock)
-			newId, err := authSrv.Register(tt.args.Ctx, tt.args.User)
-			require.NotEmpty(t, newId)
-			require.Equal(t, nil, err)
+			res, err := authSrv.Register(tt.args.Ctx, tt.args.User)
+			fmt.Println(res)
+			require.Equal(t, tt.want, res)
+			require.Equal(t, tt.err, err)
 		})
 	}
 }

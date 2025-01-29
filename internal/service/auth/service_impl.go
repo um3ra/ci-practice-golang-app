@@ -36,7 +36,7 @@ func (a *authService) Register(ctx context.Context, user *model.User) (int64, er
 	exsUser, _ := a.userRepository.GetByEmail(ctx, user.Email)
 
 	if exsUser != nil {
-		return 0, errors.New(userExistsError)
+		return 0, errors.New(UserExistsError)
 	}
 
 	_, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
