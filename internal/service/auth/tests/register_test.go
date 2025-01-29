@@ -10,12 +10,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/um3ra/auth-microservice/internal/model"
 	"github.com/um3ra/auth-microservice/internal/repository/mocks"
+	"github.com/um3ra/auth-microservice/pkg/jwt"
+	jwtMock "github.com/um3ra/auth-microservice/pkg/jwt/mocks"
 
 	authService "github.com/um3ra/auth-microservice/internal/service/auth"
 )
 
 func TestRegister(t *testing.T) {
-	type mockFun func(mock *mocks.UserRepository)
+	type mockFun func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService)
 	type args struct {
 		Ctx  context.Context
 		User *model.User
@@ -28,8 +30,9 @@ func TestRegister(t *testing.T) {
 		email    = fake.Email()
 		password = fake.Animal()
 		id       = fake.Int64()
+		secret   = fake.BeerName()
 
-		successUser = &model.User{
+		userMock = &model.User{
 			Id:       id,
 			Name:     name,
 			Password: password,
@@ -40,7 +43,7 @@ func TestRegister(t *testing.T) {
 	tests := []struct {
 		testName string
 		args     args
-		want     int64
+		want     string
 		err      error
 		mockFun  mockFun
 	}{
@@ -48,35 +51,38 @@ func TestRegister(t *testing.T) {
 			testName: "register test success case",
 			args: args{
 				Ctx:  ctx,
-				User: successUser,
+				User: userMock,
 			},
-			want: id,
+			want: secret,
 			err:  nil,
-			mockFun: func(repoMock *mocks.UserRepository) {
-				repoMock.On("GetByEmail", ctx, email).Return(nil, repoErr).Once()
-				repoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(id, nil).Once()
+			mockFun: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
+				userRepoMock.On("GetByEmail", ctx, email).Return(nil, repoErr).Once()
+				userRepoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(id, nil).Once()
+				jwtServiceMock.On("Create", jwt.JwtPayload{Email: userMock.Email}).Return(secret, nil).Once()
 			},
 		},
+
 		{
 			testName: "register test fail case (user exists)",
 			args: args{
 				Ctx:  ctx,
-				User: successUser,
+				User: userMock,
 			},
-			want: 0,
+			want: "",
 			err:  errors.New(authService.UserExistsError),
-			mockFun: func(repoMock *mocks.UserRepository) {
-				repoMock.On("GetByEmail", ctx, successUser.Email).Return(successUser, nil).Once()
-				repoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(nil, errors.New("should not be called")).Maybe()
+			mockFun: func(userRepoMock *mocks.UserRepository, jwtServiceMocj *jwtMock.JwtService) {
+				userRepoMock.On("GetByEmail", ctx, userMock.Email).Return(userMock, nil).Once()
+				userRepoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(nil, errors.New("should not be called")).Maybe()
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.testName, func(t *testing.T) {
-			authMock := mocks.NewUserRepository(t)
-			tt.mockFun(authMock)
-			authSrv := authService.NewAuthService(authMock)
+			userRepoMock := mocks.NewUserRepository(t)
+			jwtSrvMock := jwtMock.NewJwtService(t)
+			tt.mockFun(userRepoMock, jwtSrvMock)
+			authSrv := authService.NewAuthService(userRepoMock, jwtSrvMock)
 			res, err := authSrv.Register(tt.args.Ctx, tt.args.User)
 			require.Equal(t, tt.want, res)
 			require.Equal(t, tt.err, err)
