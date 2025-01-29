@@ -51,11 +51,11 @@ func TestRegister(t *testing.T) {
 				Ctx:  ctx,
 				User: successUser,
 			},
-			want: 2,
+			want: id,
 			err:  nil,
 			mockFun: func(repoMock *mocks.UserRepository) {
 				repoMock.On("GetByEmail", ctx, email).Return(nil, repoErr).Once()
-				repoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(int64(2), nil).Once()
+				repoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(id, nil).Once()
 			},
 		},
 		{
