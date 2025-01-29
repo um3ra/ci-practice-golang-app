@@ -34,11 +34,9 @@ func (a *authService) Login(ctx context.Context, email, password string) (int64,
 
 func (a *authService) Register(ctx context.Context, user *model.User) (int64, error) {
 	exsUser, _ := a.userRepository.GetByEmail(ctx, user.Email)
-
 	if exsUser != nil {
 		return 0, errors.New(UserExistsError)
 	}
-
 	_, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0, err
@@ -49,7 +47,6 @@ func (a *authService) Register(ctx context.Context, user *model.User) (int64, er
 		Password: user.Password,
 		Email:    user.Email,
 	}
-
 	id, err := a.userRepository.Create(ctx, newUser)
 	if err != nil {
 		return 0, err

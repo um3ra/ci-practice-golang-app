@@ -3,7 +3,6 @@ package tests
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v7"
@@ -68,6 +67,7 @@ func TestRegister(t *testing.T) {
 			err:  errors.New(authService.UserExistsError),
 			mockFun: func(repoMock *mocks.UserRepository) {
 				repoMock.On("GetByEmail", ctx, successUser.Email).Return(successUser, nil).Once()
+				repoMock.On("Create", ctx, mock.AnythingOfType("*model.User")).Return(nil, errors.New("should not be called")).Maybe()
 			},
 		},
 	}
@@ -78,7 +78,6 @@ func TestRegister(t *testing.T) {
 			tt.mockFun(authMock)
 			authSrv := authService.NewAuthService(authMock)
 			res, err := authSrv.Register(tt.args.Ctx, tt.args.User)
-			fmt.Println(res)
 			require.Equal(t, tt.want, res)
 			require.Equal(t, tt.err, err)
 		})
