@@ -45,16 +45,17 @@ func (a *authService) Register(ctx context.Context, user *model.User) (string, e
 	if exsUser != nil {
 		return "", errors.New(UserExistsError)
 	}
-	_, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
 
 	newUser := &model.User{
-		Name:     user.Name,
-		Password: user.Password,
-		Email:    user.Email,
+		Name: user.Name,
+		Email: user.Email,
+		Password: string(hashed),
 	}
+
 	_, err = a.userRepository.Create(ctx, newUser)
 	if err != nil {
 		return "", err

@@ -22,7 +22,7 @@ func (j *jwtService) Create(payload JwtPayload) (string, error) {
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": payload.Email,
 	})
-	tokenStr, err := t.SignedString(j.secret)
+	tokenStr, err := t.SignedString([]byte(j.secret))
 	if err != nil {
 		return "", err
 	}

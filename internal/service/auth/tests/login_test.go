@@ -72,7 +72,7 @@ func TestLogin(t *testing.T) {
 			want:     "",
 			err:      errors.New(authService.IncorrectEmailOrPassword),
 			mockBehavior: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
-				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(nil, repoErr).Once()
+				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(userMock, nil).Once()
 			},
 		},
 	}

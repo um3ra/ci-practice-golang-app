@@ -19,6 +19,7 @@ const (
 	idColumn        = "id"
 	createdAtColumn = "created_at"
 	updatedAtColumn = "updated_at"
+	passwordColumn  = "password"
 )
 
 var selectQ = sq.Select(idColumn, nameColumn, emailColumn, updatedAtColumn, createdAtColumn).From(tableName)
@@ -93,7 +94,7 @@ func (r *userRepository) GetById(ctx context.Context, id int64) (*model.User, er
 }
 
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
-	builder := selectQ.PlaceholderFormat(sq.Dollar).Where("email=$1", email)
+	builder := sq.Select(idColumn, nameColumn, emailColumn, updatedAtColumn, createdAtColumn, passwordColumn).From(tableName).PlaceholderFormat(sq.Dollar).Where("email=$1", email)
 	sql, args, err := builder.ToSql()
 
 	if err != nil {
