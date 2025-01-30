@@ -6,13 +6,13 @@ import (
 )
 
 
-type authHandler struct {
+type AuthHandler struct {
 	authService service.AuthService
 	authGrpc.UnimplementedAuthV1Server
 }
 
-func NewAuthHandler(authService service.AuthService) *authHandler{
-	return &authHandler{
+func NewAuthHandler(authService service.AuthService) *AuthHandler{
+	return &AuthHandler{
 		authService: authService,
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/um3ra/auth-microservice/config"
 	"github.com/um3ra/auth-microservice/pkg/closer"
 	userGrpc "github.com/um3ra/auth-microservice/pkg/user_v1"
+	authGrpc "github.com/um3ra/auth-microservice/pkg/auth_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -71,7 +72,9 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 	a.grpcServer = s
 	reflection.Register(a.grpcServer)
 	handler := a.provider.UserHandler(ctx)
+	authHandler := a.provider.AuthHandler(ctx)
 	userGrpc.RegisterUserV1Server(a.grpcServer, handler)
+	authGrpc.RegisterAuthV1Server(a.grpcServer, authHandler)
 	return nil
 }
 
