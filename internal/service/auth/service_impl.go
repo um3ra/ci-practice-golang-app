@@ -22,18 +22,22 @@ func NewAuthService(userRepository repository.UserRepository, jwt jwt.JwtService
 	}
 }
 
-func (a *authService) Login(ctx context.Context, email, password string) (int64, error) {
+func (a *authService) Login(ctx context.Context, email, password string) (string, error) {
 	exsUser, err := a.userRepository.GetByEmail(ctx, email)
-	if err != nil {
-		return 0, err
+	if err != nil || exsUser == nil {
+		return "", errors.New(IncorrectEmailOrPassword)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(exsUser.Password), []byte(password))
 	if err != nil {
-		return 0, err
+		return "", errors.New(IncorrectEmailOrPassword)
 	}
 
-	return exsUser.Id, err
+	token, err := a.jwtService.Create(jwt.JwtPayload{Email: exsUser.Email})
+	if err != nil {
+		return "", err
+	}
+	return token, err
 }
 
 func (a *authService) Register(ctx context.Context, user *model.User) (string, error) {
