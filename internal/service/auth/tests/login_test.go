@@ -3,7 +3,6 @@ package tests
 import (
 	"context"
 	"errors"
-	"log"
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v7"
@@ -26,9 +25,8 @@ func TestLogin(t *testing.T) {
 	password := fake.Animal()
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-
 	repoErr := errors.New("repo mock error")
 
 	var (
@@ -54,8 +52,8 @@ func TestLogin(t *testing.T) {
 			want:     secret,
 			err:      nil,
 			mockBehavior: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
-				userRepoMock.On("GetByEmail", ctx, email).Return(userMock, nil).Once()
-				jwtServiceMock.On("Create", jwt.JwtPayload{Email: email}).Return(secret, nil).Once()
+				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(userMock, nil).Once()
+				jwtServiceMock.EXPECT().Create(jwt.JwtPayload{Email: email}).Return(secret, nil).Once()
 			},
 		},
 		{
@@ -64,7 +62,7 @@ func TestLogin(t *testing.T) {
 			want:     "",
 			err:      errors.New(authService.IncorrectEmailOrPassword),
 			mockBehavior: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
-				userRepoMock.On("GetByEmail", ctx, email).Return(nil, repoErr).Once()
+				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(nil, repoErr).Once()
 			},
 		},
 
@@ -74,7 +72,7 @@ func TestLogin(t *testing.T) {
 			want:     "",
 			err:      errors.New(authService.IncorrectEmailOrPassword),
 			mockBehavior: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
-				userRepoMock.On("GetByEmail", ctx, email).Return(nil, repoErr).Once()
+				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(nil, repoErr).Once()
 			},
 		},
 	}

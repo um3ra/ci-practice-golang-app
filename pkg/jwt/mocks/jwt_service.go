@@ -12,6 +12,14 @@ type JwtService struct {
 	mock.Mock
 }
 
+type JwtService_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *JwtService) EXPECT() *JwtService_Expecter {
+	return &JwtService_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: payload
 func (_m *JwtService) Create(payload jwt.JwtPayload) (string, error) {
 	ret := _m.Called(payload)
@@ -38,6 +46,34 @@ func (_m *JwtService) Create(payload jwt.JwtPayload) (string, error) {
 	}
 
 	return r0, r1
+}
+
+// JwtService_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type JwtService_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - payload jwt.JwtPayload
+func (_e *JwtService_Expecter) Create(payload interface{}) *JwtService_Create_Call {
+	return &JwtService_Create_Call{Call: _e.mock.On("Create", payload)}
+}
+
+func (_c *JwtService_Create_Call) Run(run func(payload jwt.JwtPayload)) *JwtService_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(jwt.JwtPayload))
+	})
+	return _c
+}
+
+func (_c *JwtService_Create_Call) Return(_a0 string, _a1 error) *JwtService_Create_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *JwtService_Create_Call) RunAndReturn(run func(jwt.JwtPayload) (string, error)) *JwtService_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Parse provides a mock function with given fields: token
@@ -68,6 +104,34 @@ func (_m *JwtService) Parse(token string) (bool, *jwt.JwtPayload) {
 	}
 
 	return r0, r1
+}
+
+// JwtService_Parse_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Parse'
+type JwtService_Parse_Call struct {
+	*mock.Call
+}
+
+// Parse is a helper method to define mock.On call
+//   - token string
+func (_e *JwtService_Expecter) Parse(token interface{}) *JwtService_Parse_Call {
+	return &JwtService_Parse_Call{Call: _e.mock.On("Parse", token)}
+}
+
+func (_c *JwtService_Parse_Call) Run(run func(token string)) *JwtService_Parse_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *JwtService_Parse_Call) Return(_a0 bool, _a1 *jwt.JwtPayload) *JwtService_Parse_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *JwtService_Parse_Call) RunAndReturn(run func(string) (bool, *jwt.JwtPayload)) *JwtService_Parse_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewJwtService creates a new instance of JwtService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

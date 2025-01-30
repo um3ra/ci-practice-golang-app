@@ -14,6 +14,14 @@ type UserRepository struct {
 	mock.Mock
 }
 
+type UserRepository_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *UserRepository) EXPECT() *UserRepository_Expecter {
+	return &UserRepository_Expecter{mock: &_m.Mock}
+}
+
 // Create provides a mock function with given fields: ctx, user
 func (_m *UserRepository) Create(ctx context.Context, user *model.User) (int64, error) {
 	ret := _m.Called(ctx, user)
@@ -40,6 +48,35 @@ func (_m *UserRepository) Create(ctx context.Context, user *model.User) (int64, 
 	}
 
 	return r0, r1
+}
+
+// UserRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type UserRepository_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - ctx context.Context
+//   - user *model.User
+func (_e *UserRepository_Expecter) Create(ctx interface{}, user interface{}) *UserRepository_Create_Call {
+	return &UserRepository_Create_Call{Call: _e.mock.On("Create", ctx, user)}
+}
+
+func (_c *UserRepository_Create_Call) Run(run func(ctx context.Context, user *model.User)) *UserRepository_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.User))
+	})
+	return _c
+}
+
+func (_c *UserRepository_Create_Call) Return(_a0 int64, _a1 error) *UserRepository_Create_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserRepository_Create_Call) RunAndReturn(run func(context.Context, *model.User) (int64, error)) *UserRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // GetAll provides a mock function with given fields: ctx
@@ -72,6 +109,34 @@ func (_m *UserRepository) GetAll(ctx context.Context) ([]model.User, error) {
 	return r0, r1
 }
 
+// UserRepository_GetAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAll'
+type UserRepository_GetAll_Call struct {
+	*mock.Call
+}
+
+// GetAll is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *UserRepository_Expecter) GetAll(ctx interface{}) *UserRepository_GetAll_Call {
+	return &UserRepository_GetAll_Call{Call: _e.mock.On("GetAll", ctx)}
+}
+
+func (_c *UserRepository_GetAll_Call) Run(run func(ctx context.Context)) *UserRepository_GetAll_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *UserRepository_GetAll_Call) Return(_a0 []model.User, _a1 error) *UserRepository_GetAll_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserRepository_GetAll_Call) RunAndReturn(run func(context.Context) ([]model.User, error)) *UserRepository_GetAll_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByEmail provides a mock function with given fields: ctx, email
 func (_m *UserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	ret := _m.Called(ctx, email)
@@ -102,6 +167,35 @@ func (_m *UserRepository) GetByEmail(ctx context.Context, email string) (*model.
 	return r0, r1
 }
 
+// UserRepository_GetByEmail_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByEmail'
+type UserRepository_GetByEmail_Call struct {
+	*mock.Call
+}
+
+// GetByEmail is a helper method to define mock.On call
+//   - ctx context.Context
+//   - email string
+func (_e *UserRepository_Expecter) GetByEmail(ctx interface{}, email interface{}) *UserRepository_GetByEmail_Call {
+	return &UserRepository_GetByEmail_Call{Call: _e.mock.On("GetByEmail", ctx, email)}
+}
+
+func (_c *UserRepository_GetByEmail_Call) Run(run func(ctx context.Context, email string)) *UserRepository_GetByEmail_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *UserRepository_GetByEmail_Call) Return(_a0 *model.User, _a1 error) *UserRepository_GetByEmail_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserRepository_GetByEmail_Call) RunAndReturn(run func(context.Context, string) (*model.User, error)) *UserRepository_GetByEmail_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetById provides a mock function with given fields: ctx, id
 func (_m *UserRepository) GetById(ctx context.Context, id int64) (*model.User, error) {
 	ret := _m.Called(ctx, id)
@@ -130,6 +224,35 @@ func (_m *UserRepository) GetById(ctx context.Context, id int64) (*model.User, e
 	}
 
 	return r0, r1
+}
+
+// UserRepository_GetById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetById'
+type UserRepository_GetById_Call struct {
+	*mock.Call
+}
+
+// GetById is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id int64
+func (_e *UserRepository_Expecter) GetById(ctx interface{}, id interface{}) *UserRepository_GetById_Call {
+	return &UserRepository_GetById_Call{Call: _e.mock.On("GetById", ctx, id)}
+}
+
+func (_c *UserRepository_GetById_Call) Run(run func(ctx context.Context, id int64)) *UserRepository_GetById_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(int64))
+	})
+	return _c
+}
+
+func (_c *UserRepository_GetById_Call) Return(_a0 *model.User, _a1 error) *UserRepository_GetById_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *UserRepository_GetById_Call) RunAndReturn(run func(context.Context, int64) (*model.User, error)) *UserRepository_GetById_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // NewUserRepository creates a new instance of UserRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
