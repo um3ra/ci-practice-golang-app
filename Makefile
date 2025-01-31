@@ -7,6 +7,7 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 	GOBIN=$(LOCAL_BIN) go install github.com/vektra/mockery/v2@v2.51.1
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4
+	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@v1.2.1
 
 
 get-deps:
@@ -29,11 +30,13 @@ generate-user-api:
 
 generate-auth-api:
 	mkdir -p pkg/auth_v1
-	protoc --proto_path api/auth_v1 \
+	protoc --proto_path api/auth_v1 --proto_path vendor.protogen \
 	--go_out pkg/auth_v1 --go_opt=paths=source_relative \
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=pkg/auth_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
+	--plugin=protoc-gen-validate=bin/protoc-gen-validate \
+	--validate_out lang=go:pkg/auth_v1 --validate_opt=paths=source_relative \
 	api/auth_v1/auth.proto
 
 
@@ -74,4 +77,13 @@ test-coverage:
 	grep -sqFx "/coverage.out" .gitignore || echo "\n/coverage.out" >> .gitignore
 
 lint:
-	bin/golangci-lint run ./...	
+	bin/golangci-lint run ./...
+
+
+vendor-proto:
+	@if [ ! -d vendor.protogen/validate ]; then \
+		mkdir -p vendor.protogen/validate &&\
+		git clone https://github.com/envoyproxy/protoc-gen-validate vendor.protogen/protoc-gen-validate &&\
+		mv vendor.protogen/protoc-gen-validate/validate/*.proto vendor.protogen/validate &&\
+		rm -rf vendor.protogen/protoc-gen-validate ;\
+	fi
