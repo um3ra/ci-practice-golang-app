@@ -10,6 +10,7 @@ import (
 	"github.com/um3ra/auth-microservice/internal/model"
 	authMockSrv "github.com/um3ra/auth-microservice/internal/service/mocks"
 	authGrpc "github.com/um3ra/auth-microservice/pkg/auth_v1"
+	"errors"
 )
 
 func TestHandler_register(t *testing.T) {
@@ -57,6 +58,24 @@ func TestHandler_register(t *testing.T) {
 			err: nil,
 			mockBehavior: func(service *authMockSrv.AuthService) {
 				service.EXPECT().Register(ctx, &user).Return(token, nil).Once()
+			},
+		},
+
+
+		{
+			name: "handler register fail case (password mismatch)",
+			want: nil,
+			args: args{
+				ctx: ctx,
+				req: &authGrpc.RegisterRequest{
+					Name: name,
+					Email: email,
+					Password: password,
+					ConfirmPassword: "random",
+				},
+			},
+			err: errors.New(auth.PasswordMismatch),
+			mockBehavior: func(service *authMockSrv.AuthService) {
 			},
 		},
 	}

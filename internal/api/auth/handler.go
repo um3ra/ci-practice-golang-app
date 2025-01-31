@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 
 	"github.com/um3ra/auth-microservice/internal/model"
 	"github.com/um3ra/auth-microservice/internal/service"
@@ -30,6 +31,9 @@ func (h *AuthHandler) Login(ctx context.Context, req *authGrpc.LoginRequest) (*a
 }
 
 func (h *AuthHandler) Register(ctx context.Context, req *authGrpc.RegisterRequest) (*authGrpc.RegisterResponse, error) {
+	if req.GetPassword() != req.ConfirmPassword {
+		return nil, errors.New(PasswordMismatch)
+	}
 	newUser := model.User{
 		Name: req.GetName(),
 		Password: req.GetPassword(),
