@@ -55,15 +55,22 @@ func (cl *Closer) add(funcs ...func() error) {
 }
 
 func (cl *Closer) closeAll() {
-	errs := make(chan error, len(cl.funcs))
-	for _, f := range cl.funcs {
-		go func(f func() error) {
-			errs <- f()
-		}(f)
-	}
-	for i := 0; i < cap(errs); i++ {
-		if err := <-errs; err != nil {
-			log.Println("error returned from Closer")
+	cl.once.Do(func() {
+		cl.mu.Lock()
+		funcs := cl.funcs
+		cl.funcs = nil
+		cl.mu.Unlock()
+
+		errs := make(chan error, len(funcs))
+		for _, f := range funcs {
+			go func(f func() error) {
+				errs <- f()
+			}(f)
 		}
-	}
+		for i := 0; i < cap(errs); i++ {
+			if err := <-errs; err != nil {
+				log.Println("error returned from Closer")
+			}
+		}
+	})
 }

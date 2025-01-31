@@ -66,7 +66,7 @@ l-migration-down:
 
 test-coverage:
 	go clean -testcache
-	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=github.com/um3ra/auth-microservice/internal/service/... -count 5
+	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=github.com/um3ra/auth-microservice/internal/service/...,github.com/um3ra/auth-microservice/internal/api/... -count 5
 	grep -v 'mocks\|config' coverage.tmp.out  > coverage.out
 	rm coverage.tmp.out
 	go tool cover -html=coverage.out;

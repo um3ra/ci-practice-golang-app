@@ -27,7 +27,7 @@ func TestLogin(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	repoErr := errors.New("repo mock error")
+	mockErr := errors.New("repo mock error")
 
 	var (
 		ctx      = context.Background()
@@ -62,7 +62,7 @@ func TestLogin(t *testing.T) {
 			want:     "",
 			err:      errors.New(authService.IncorrectEmailOrPassword),
 			mockBehavior: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
-				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(nil, repoErr).Once()
+				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(nil, mockErr).Once()
 			},
 		},
 
@@ -73,6 +73,17 @@ func TestLogin(t *testing.T) {
 			err:      errors.New(authService.IncorrectEmailOrPassword),
 			mockBehavior: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
 				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(userMock, nil).Once()
+			},
+		},
+
+		{
+			testName: "login fail case (jwt error)",
+			args:     args{Ctx: ctx, Email: email, Password: password},
+			want:     "",
+			err:      mockErr,
+			mockBehavior: func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService) {
+				userRepoMock.EXPECT().GetByEmail(ctx, email).Return(userMock, nil).Once()
+				jwtServiceMock.EXPECT().Create(jwt.JwtPayload{Email: email}).Return("", mockErr).Once()
 			},
 		},
 	}
