@@ -21,6 +21,8 @@ func TestHandler_register(t *testing.T) {
 	}
 	type mockBehavior func (service *authMockSrv.AuthService)
 
+	mockError := errors.New("mock error")
+
 	var (
 		ctx      = context.Background()
 		name = fake.Name()
@@ -76,6 +78,24 @@ func TestHandler_register(t *testing.T) {
 			},
 			err: errors.New(auth.PasswordMismatch),
 			mockBehavior: func(service *authMockSrv.AuthService) {
+			},
+		},
+
+		{
+			name: "handler register fail case (service error)",
+			want: nil,
+			args: args{
+				ctx: ctx,
+				req: &authGrpc.RegisterRequest{
+					Name: name,
+					Email: email,
+					Password: password,
+					ConfirmPassword: password,
+				},
+			},
+			err: mockError,
+			mockBehavior: func(service *authMockSrv.AuthService) {
+				service.EXPECT().Register(ctx, &user).Return("", mockError).Once()
 			},
 		},
 	}

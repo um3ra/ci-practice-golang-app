@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	fake "github.com/brianvoe/gofakeit/v7"
@@ -17,8 +18,8 @@ func TestHandler_login(t *testing.T) {
 		ctx context.Context
 		req *authGrpc.LoginRequest
 	}
-
 	var (
+		mockErr = errors.New("mock error")
 		ctx      = context.Background()
 		email    = fake.Email()
 		password = fake.Animal()
@@ -47,6 +48,22 @@ func TestHandler_login(t *testing.T) {
 			err: nil,
 			mockBehavior: func(authService *authMockSrv.AuthService) {
 				authService.EXPECT().Login(ctx, email, password).Return(token, nil).Once()
+			},
+		},
+
+		{
+			name: "handler login fail case",
+			args: args{
+				ctx: ctx,
+				req: &authGrpc.LoginRequest{
+					Email:    email,
+					Password: password,
+				},
+			},
+			want: nil,
+			err: mockErr,
+			mockBehavior: func(authService *authMockSrv.AuthService) {
+				authService.EXPECT().Login(ctx, email, password).Return("", mockErr).Once()
 			},
 		},
 	}
