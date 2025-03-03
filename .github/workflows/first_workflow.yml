@@ -6,3 +6,5 @@ jobs:
     steps:
       - name: Display test
         run: echo "test"
+      - name: Check go version
+        run: go version
