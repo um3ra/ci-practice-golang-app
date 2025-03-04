@@ -18,9 +18,8 @@ const (
 	envPath = ".env"
 )
 
-func NewApp(ctx context.Context) (*App, error) {
+func NewApp(ctx context.Context, provider ServiceProvider) (*App, error) {
 	app := &App{}
-
 	err := app.initDeps(ctx)
 
 	if err != nil {
@@ -38,14 +37,16 @@ func (a *App) Run() error {
 }
 
 type App struct {
-	provider   *serviceProvider
+	// interface
+	provider   ServiceProvider
 	grpcServer *grpc.Server
 }
 
+
+// decoupling
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(ctx context.Context) error{
 		a.initConfig,
-		a.initProvider,
 		a.initGrpcServer,
 	}
 	for _, f := range inits {
@@ -56,6 +57,7 @@ func (a *App) initDeps(ctx context.Context) error {
 	return nil
 }
 
+// ------ d inversion providing interface
 func (a *App) initProvider(_ context.Context) error {
 	a.provider = newServiceProvider()
 	return nil
