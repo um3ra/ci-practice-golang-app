@@ -14,7 +14,7 @@ import (
 	authGrpc "github.com/um3ra/auth-microservice/pkg/auth_v1"
 )
 
-func TestHandler_register(t *testing.T) {
+func TestUnitHandler_register(t *testing.T) {
 
 	type args struct {
 		ctx context.Context

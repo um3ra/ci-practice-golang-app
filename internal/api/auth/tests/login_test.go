@@ -12,7 +12,7 @@ import (
 	authGrpc "github.com/um3ra/auth-microservice/pkg/auth_v1"
 )
 
-func TestHandler_login(t *testing.T) {
+func TestUnitHandler_login(t *testing.T) {
 	type mockBehavior func(authService *authMockSrv.AuthService)
 	type args struct {
 		ctx context.Context

@@ -12,7 +12,6 @@ import (
 	"github.com/um3ra/auth-microservice/pkg/jwt"
 )
 
-// ServiceProvider - интерфейс для DI-контейнера
 type ServiceProvider interface {
 	DbConfig() config.DbConfig
 	GrpcConfig() config.GrpcConfig

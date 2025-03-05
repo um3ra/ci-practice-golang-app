@@ -1,3 +1,5 @@
+
+
 package tests
 
 import (
@@ -8,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *ApiTestSuite) TestIntegration_AuthApi_Register() {
+func (s *ApiTestSuite) Test_AuthApi_Register_Integration() {
 	req := auth_v1.RegisterRequest{
 		Name:            "michael",
 		Email:           "michael@mail.com",
@@ -21,7 +23,7 @@ func (s *ApiTestSuite) TestIntegration_AuthApi_Register() {
 	s.Require().NotEmpty(res.Token)
 }
 
-func (s *ApiTestSuite) TestIntegration_AuthApi_Register_Validation_Failure() {
+func (s *ApiTestSuite) Test_AuthApi_Register_Validation_Failure_Integration() {
 	testCases := []struct {
 		name string
 		req  auth_v1.RegisterRequest

@@ -76,14 +76,16 @@ test-coverage:
 	go tool cover -func=./coverage.out | grep "total";
 	grep -sqFx "/coverage.out" .gitignore || echo "\n/coverage.out" >> .gitignore
 
-
+unit-test:
+	go clean -testcache
+	go test -run 'Unit' ./... -v
 
 TEST_DB_DSN=host=localhost port=55433 dbname=test user=test password=test sslmode=disable
 integration-tests:
 	docker compose -f ./db/docker-compose.test.yml build --no-cache
 	docker compose -f ./db/docker-compose.test.yml up -d --wait
 	sleep 3
-	TEST_DB_DSN="$(TEST_DB_DSN)" GRPC_TEST_ADDR="localhost:8889" go test -v ./tests; \
+	TEST_DB_DSN="$(TEST_DB_DSN)" GRPC_TEST_ADDR="localhost:8889" go test -run 'Integration' ./... -v \
 	EXIT_CODE=$$?; \
 	docker compose -f ./db/docker-compose.test.yml down --volumes; \
 	exit $$EXIT_CODE

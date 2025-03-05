@@ -15,7 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func TestLogin(t *testing.T) {
+func TestUnitLogin(t *testing.T) {
 	type mockBehavior func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService)
 	type args struct {
 		Ctx      context.Context

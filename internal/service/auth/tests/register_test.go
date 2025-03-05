@@ -16,7 +16,7 @@ import (
 	authService "github.com/um3ra/auth-microservice/internal/service/auth"
 )
 
-func TestRegister(t *testing.T) {
+func TestUnitRegister(t *testing.T) {
 	type mockBehavior func(userRepoMock *mocks.UserRepository, jwtServiceMock *jwtMock.JwtService)
 	type args struct {
 		Ctx  context.Context

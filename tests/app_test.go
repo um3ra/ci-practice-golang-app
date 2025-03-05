@@ -1,3 +1,5 @@
+
+
 package tests
 
 import (
@@ -21,9 +23,6 @@ var (
 	grpcTestAddr = os.Getenv("GRPC_TEST_ADDR")
 )
 
-// const (
-// 	grpcTestAddr = "localhost:0"
-// )
 
 type ApiTestSuite struct {
 	suite.Suite
@@ -79,6 +78,6 @@ func (s *ApiTestSuite) TearDownSuite() {
 	s.grpcServer.GracefulStop()
 }
 
-func TestIntegration_HttpTestSuite(t *testing.T) {
+func Test_HttpTestSuite_Integration(t *testing.T) {
 	suite.Run(t, new(ApiTestSuite))
 }
