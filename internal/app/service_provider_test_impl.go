@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/um3ra/auth-microservice/config"
 	authApi "github.com/um3ra/auth-microservice/internal/api/auth"
@@ -18,9 +19,12 @@ import (
 	jwtSrv "github.com/um3ra/auth-microservice/pkg/jwt"
 )
 
-type serviceProvider struct {
+var (
+	TEST_DB_DSN = os.Getenv("TEST_DB_DSN")
+)
+
+type serviceProviderTest struct {
 	db             db.Client
-	dbConfig       config.DbConfig
 	grpcConfig     config.GrpcConfig
 	authConfig     config.AuthConfig
 	userRepository repository.UserRepository
@@ -31,23 +35,11 @@ type serviceProvider struct {
 	authHandler    *authApi.AuthHandler
 }
 
-func NewServiceProvider() *serviceProvider {
-	return &serviceProvider{}
+func NewServiceProviderTest() *serviceProviderTest {
+	return &serviceProviderTest{}
 }
 
-func (s *serviceProvider) DbConfig() config.DbConfig {
-	if s.dbConfig == nil {
-		dbcfg, err := config.NewDbConfig()
-		if err != nil {
-			log.Fatalf("Failed to get pg config: %s", err.Error())
-		}
-		s.dbConfig = dbcfg
-	}
-
-	return s.dbConfig
-}
-
-func (s *serviceProvider) GrpcConfig() config.GrpcConfig {
+func (s *serviceProviderTest) GrpcConfig() config.GrpcConfig {
 	if s.grpcConfig == nil {
 		grpc, err := config.NewGrpcConfig()
 		if err != nil {
@@ -58,7 +50,7 @@ func (s *serviceProvider) GrpcConfig() config.GrpcConfig {
 	return s.grpcConfig
 }
 
-func (s *serviceProvider) AuthConfig() config.AuthConfig {
+func (s *serviceProviderTest) AuthConfig() config.AuthConfig {
 	if s.authConfig == nil {
 		authCfg, err := config.NewAuthConfig()
 		if err != nil {
@@ -69,9 +61,12 @@ func (s *serviceProvider) AuthConfig() config.AuthConfig {
 	return s.authConfig
 }
 
-func (s *serviceProvider) DbClient(ctx context.Context) db.Client {
+func (s *serviceProviderTest) DbClient(ctx context.Context) db.Client {
 	if s.db == nil {
-		client, err := pg.NewClient(ctx, s.DbConfig().DSN())
+		if len(TEST_DB_DSN) == 0 {
+			log.Fatalf("test db dsn must be provided!")
+		}
+		client, err := pg.NewClient(ctx, TEST_DB_DSN)
 		if err != nil {
 			log.Fatalf("Failed to database connect: %s\n", err.Error())
 		}
@@ -86,42 +81,42 @@ func (s *serviceProvider) DbClient(ctx context.Context) db.Client {
 	return s.db
 }
 
-func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
+func (s *serviceProviderTest) UserRepository(ctx context.Context) repository.UserRepository {
 	if s.userRepository == nil {
 		s.userRepository = userRepo.NewUserRepository(s.DbClient(ctx))
 	}
 	return s.userRepository
 }
 
-func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
+func (s *serviceProviderTest) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userSrv.NewUserService(s.UserRepository(ctx))
 	}
 	return s.userService
 }
 
-func (s *serviceProvider) JwtService() jwtSrv.JwtService {
+func (s *serviceProviderTest) JwtService() jwtSrv.JwtService {
 	if s.jwtService == nil {
-		s.jwtService = jwtSrv.NewJwtService(s.AuthConfig().Secret())
+		s.jwtService = jwtSrv.NewJwtService("test")
 	}
 	return s.jwtService
 }
 
-func (s *serviceProvider) AuthService(ctx context.Context) service.AuthService {
+func (s *serviceProviderTest) AuthService(ctx context.Context) service.AuthService {
 	if s.authService == nil {
 		s.authService = authSrv.NewAuthService(s.UserRepository(ctx), s.JwtService())
 	}
 	return s.authService
 }
 
-func (s *serviceProvider) UserHandler(ctx context.Context) *userApi.UserHandler {
+func (s *serviceProviderTest) UserHandler(ctx context.Context) *userApi.UserHandler {
 	if s.userHandler == nil {
 		s.userHandler = userApi.NewUserHandler(s.UserService(ctx))
 	}
 	return s.userHandler
 }
 
-func (s *serviceProvider) AuthHandler(ctx context.Context) *authApi.AuthHandler {
+func (s *serviceProviderTest) AuthHandler(ctx context.Context) *authApi.AuthHandler {
 	if s.authHandler == nil {
 		s.authHandler = authApi.NewAuthHandler(s.AuthService(ctx))
 	}

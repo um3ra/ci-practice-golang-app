@@ -1,0 +1,31 @@
+services:
+  "test_database":
+    container_name: "postgres_auth_api_test"
+    image: "postgres:alpine3.18"
+    restart: "unless-stopped"
+    ports: ["55433:5432"]
+    environment:
+      POSTGRES_PASSWORD: "test"
+      POSTGRES_DB: "test"
+      POSTGRES_USER: "test"
+    volumes:
+      - "test_db_auth_data:/var/lib/postgresql/data"
+    networks:
+      - "test_auth_db_network"
+  "db_test_migrator":
+    environment:
+      POSTGRES_PASSWORD: "test"
+      POSTGRES_DB: "test"
+      POSTGRES_USER: "test"
+      DB_HOST: test_database
+    build:
+      dockerfile: "./migrator.Dockerfile"
+    restart: "on-failure"
+    networks:
+      - "test_auth_db_network"
+
+volumes:
+  test_db_auth_data:
+
+networks:
+  test_auth_db_network:

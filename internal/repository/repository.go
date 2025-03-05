@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/um3ra/auth-microservice/internal/model"
 )
 

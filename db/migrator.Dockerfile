@@ -12,7 +12,7 @@ WORKDIR /root
 
 ADD migrations/*.sql db/migrations/
 ADD migration.sh .
-ADD .env .
+
 
 RUN chmod +x migration.sh
 

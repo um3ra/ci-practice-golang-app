@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/um3ra/auth-microservice/internal/converter"
 	"github.com/um3ra/auth-microservice/internal/service"
 	userGrpc "github.com/um3ra/auth-microservice/pkg/user_v1"

@@ -19,7 +19,7 @@ func TestHandler_login(t *testing.T) {
 		req *authGrpc.LoginRequest
 	}
 	var (
-		mockErr = errors.New("mock error")
+		mockErr  = errors.New("mock error")
 		ctx      = context.Background()
 		email    = fake.Email()
 		password = fake.Animal()
@@ -61,7 +61,7 @@ func TestHandler_login(t *testing.T) {
 				},
 			},
 			want: nil,
-			err: mockErr,
+			err:  mockErr,
 			mockBehavior: func(authService *authMockSrv.AuthService) {
 				authService.EXPECT().Login(ctx, email, password).Return("", mockErr).Once()
 			},

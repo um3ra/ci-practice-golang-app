@@ -51,8 +51,8 @@ func (a *authService) Register(ctx context.Context, user *model.User) (string, e
 	}
 
 	newUser := &model.User{
-		Name: user.Name,
-		Email: user.Email,
+		Name:     user.Name,
+		Email:    user.Email,
 		Password: string(hashed),
 	}
 

@@ -19,7 +19,7 @@ type authConfig struct {
 
 func NewAuthConfig() (AuthConfig, error) {
 	secret := os.Getenv(secretKey)
-	if (len(secret) == 0) {
+	if len(secret) == 0 {
 		return nil, errors.New("JWT Secret env must be provided!")
 	}
 	return &authConfig{

@@ -14,9 +14,9 @@ func ToUserPbFromService(user *model.User) *pb.User {
 	}
 
 	return &pb.User{
-		Id: user.Id,
-		Name: user.Name,
-		Email: user.Email,
+		Id:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
 	}
@@ -24,7 +24,7 @@ func ToUserPbFromService(user *model.User) *pb.User {
 
 func ToUserFromPb(user *pb.User) *model.User {
 	return &model.User{
-		Name: user.Name,
+		Name:  user.Name,
 		Email: user.Email,
 	}
 }

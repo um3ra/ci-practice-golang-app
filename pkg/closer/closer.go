@@ -7,7 +7,6 @@ import (
 	"sync"
 )
 
-
 var globalCloser = NewCloser()
 
 func Add(funcs ...func() error) {

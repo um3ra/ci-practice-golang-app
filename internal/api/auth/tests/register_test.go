@@ -4,13 +4,14 @@ import (
 	"context"
 	"testing"
 
+	"errors"
+
 	fake "github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/require"
 	"github.com/um3ra/auth-microservice/internal/api/auth"
 	"github.com/um3ra/auth-microservice/internal/model"
 	authMockSrv "github.com/um3ra/auth-microservice/internal/service/mocks"
 	authGrpc "github.com/um3ra/auth-microservice/pkg/auth_v1"
-	"errors"
 )
 
 func TestHandler_register(t *testing.T) {
@@ -19,28 +20,28 @@ func TestHandler_register(t *testing.T) {
 		ctx context.Context
 		req *authGrpc.RegisterRequest
 	}
-	type mockBehavior func (service *authMockSrv.AuthService)
+	type mockBehavior func(service *authMockSrv.AuthService)
 
 	mockError := errors.New("mock error")
 
 	var (
 		ctx      = context.Background()
-		name = fake.Name()
+		name     = fake.Name()
 		email    = fake.Email()
 		password = fake.Animal()
 		token    = fake.BeerName()
 	)
 	user := model.User{
-		Name: name,
-		Email: email,
+		Name:     name,
+		Email:    email,
 		Password: password,
 	}
 
-	testTable := []struct{
-		name string
-		want *authGrpc.RegisterResponse
-		args args
-		err error
+	testTable := []struct {
+		name         string
+		want         *authGrpc.RegisterResponse
+		args         args
+		err          error
 		mockBehavior mockBehavior
 	}{
 		{
@@ -51,9 +52,9 @@ func TestHandler_register(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				req: &authGrpc.RegisterRequest{
-					Name: name,
-					Email: email,
-					Password: password,
+					Name:            name,
+					Email:           email,
+					Password:        password,
 					ConfirmPassword: password,
 				},
 			},
@@ -63,16 +64,15 @@ func TestHandler_register(t *testing.T) {
 			},
 		},
 
-
 		{
 			name: "handler register fail case (password mismatch)",
 			want: nil,
 			args: args{
 				ctx: ctx,
 				req: &authGrpc.RegisterRequest{
-					Name: name,
-					Email: email,
-					Password: password,
+					Name:            name,
+					Email:           email,
+					Password:        password,
 					ConfirmPassword: "random",
 				},
 			},
@@ -87,9 +87,9 @@ func TestHandler_register(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				req: &authGrpc.RegisterRequest{
-					Name: name,
-					Email: email,
-					Password: password,
+					Name:            name,
+					Email:           email,
+					Password:        password,
 					ConfirmPassword: password,
 				},
 			},

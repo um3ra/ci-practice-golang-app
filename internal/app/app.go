@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log"
 	"net"
 
 	"github.com/um3ra/auth-microservice/config"
@@ -18,7 +19,7 @@ const (
 	envPath = ".env"
 )
 
-func NewApp(ctx context.Context, provider ServiceProvider) (*App, error) {
+func NewApp(ctx context.Context) (*App, error) {
 	app := &App{}
 	err := app.initDeps(ctx)
 
@@ -37,16 +38,14 @@ func (a *App) Run() error {
 }
 
 type App struct {
-	// interface
 	provider   ServiceProvider
 	grpcServer *grpc.Server
 }
 
-
-// decoupling
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(ctx context.Context) error{
 		a.initConfig,
+		a.initProvider,
 		a.initGrpcServer,
 	}
 	for _, f := range inits {
@@ -57,9 +56,8 @@ func (a *App) initDeps(ctx context.Context) error {
 	return nil
 }
 
-// ------ d inversion providing interface
 func (a *App) initProvider(_ context.Context) error {
-	a.provider = newServiceProvider()
+	a.provider = NewServiceProvider()
 	return nil
 }
 
@@ -83,6 +81,7 @@ func (a *App) initGrpcServer(ctx context.Context) error {
 
 func (a *App) runGrpcServer() error {
 	l, err := net.Listen("tcp", a.provider.GrpcConfig().Address())
+	log.Printf("Server is listening on : %s", l.Addr())
 	if err != nil {
 		return err
 	}

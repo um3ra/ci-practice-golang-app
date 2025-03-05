@@ -33,7 +33,7 @@ func TestRegister(t *testing.T) {
 		secret   = fake.BeerName()
 
 		userMock = &model.User{
-			Id:       id,
+			ID:       id,
 			Name:     name,
 			Password: password,
 			Email:    email,

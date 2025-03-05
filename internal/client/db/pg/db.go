@@ -2,15 +2,15 @@ package pg
 
 import (
 	"context"
-	"fmt"
-	"log"
+	_ "fmt"
+	_ "log"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/um3ra/auth-microservice/internal/client/db"
-	"github.com/um3ra/auth-microservice/internal/client/db/prettier"
+	_ "github.com/um3ra/auth-microservice/internal/client/db/prettier"
 )
 
 type key string
@@ -101,10 +101,10 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 }
 
 func logQuery(ctx context.Context, q db.Query, args ...interface{}) {
-	prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
-	log.Println(
-		ctx,
-		fmt.Sprintf("sql: %s", q.Name),
-		fmt.Sprintf("query: %s", prettyQuery),
-	)
+	// prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
+	// log.Println(
+	// 	ctx,
+	// 	fmt.Sprintf("sql: %s", q.Name),
+	// 	fmt.Sprintf("query: %s", prettyQuery),
+	// )
 }

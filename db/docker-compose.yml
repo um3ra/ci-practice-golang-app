@@ -6,7 +6,7 @@ services:
     image: "postgres:alpine3.18"
     restart: "unless-stopped"
     ports:
-      - "${PG_PORT}:5432"
+      - "55432:5432"
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_DB: "${POSTGRES_DB}"
@@ -14,12 +14,14 @@ services:
     volumes:
       - postgres_volume:/var/lib/postgresql/data
   migrator:
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      DB_HOST: postgres 
     build:
       dockerfile: "./migrator.Dockerfile"
-    restart: "on-failure"  
-    environment:
-      DB_HOST: postgres  
-      
+    restart: "on-failure"
 
 volumes:
   postgres_volume:
