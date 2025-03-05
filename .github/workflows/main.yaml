@@ -4,22 +4,7 @@ on:
     branches:
       - testing
 jobs:
-  "build":
-    runs-on: ubuntu-22.04
-    steps:
-      - name: "Checkout app"
-        uses: actions/checkout@v4
-      - name: "Set up"
-        uses: "actions/setup-go@v5"
-        with:
-          go-version: 1.23
-          cache-depenency-path: go.sum
-      - name: Build
-        run: go build -o ./bin/ -v ./...
-
-      - name: Run unit tests
-        run: go test -run 'Unit' -v ./...
-  "linter":
+  linter:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -31,3 +16,43 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.63
+  unit_tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Checkout app"
+        uses: actions/checkout@v4
+      - name: "Set up"
+        uses: "actions/setup-go@v5"
+        with:
+          go-version: 1.23
+          cache-dependency-path: go.sum
+      - name: Run unit tests
+        run: go test -run 'Unit' -v ./...
+  integration_tests:
+    env:
+      TEST_DB_DSN: "host=localhost port=55433 dbname=test user=test password=test sslmode=disable"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Checkout app"
+        uses: actions/checkout@v4
+      - name: "set up db container"
+        run: |
+          docker compose -f ./db/docker-compose.test.yml up -d --wait
+      - name: "Set up GO"
+        uses: "actions/setup-go@v5"
+        with:
+          go-version: 1.23
+          cache-dependency-path: go.sum
+      - name: Run integration tests
+        run: TEST_DB_DSN="$TEST_DB_DSN" GRPC_TEST_ADDR="localhost:8889" go test -run 'Integration' ./... -v
+  build:
+    runs-on: ubuntu-22.04
+    needs: [linter, unit_tests, integration_tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: false
+      - name: "build"
+        run: go build -o ./bin/ -v ./... 
